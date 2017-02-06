@@ -28,7 +28,24 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	//compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+bootRun {
+    // Make sure we can specify the profile with -Dspring.profiles.active=dev
+    systemProperties = System.properties
+    
+    // Default to dev if no active profile is specified.
+    doFirst {
+        if (!System.getenv('SPRING_PROFILES_ACTIVE') && !systemProperties['spring.profiles.active']) {
+            systemProperty 'spring.profiles.active', 'dev,local'
+        }
+        if (!System.getenv('SPRING_CONFIG_LOCATION') && !systemProperties['spring.config.location']) {
+	        systemProperty 'spring.config.location', 'classpath:config/link-security.yml,classpath:config/link-logging.yml,classpath:config/link-swagger.yml'
+	    }
+        systemProperty 'spring.config.name', 'mysampleapp'
+    }
+   classpath = project.sourceSets.test.runtimeClasspath
 }
